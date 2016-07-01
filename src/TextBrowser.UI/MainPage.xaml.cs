@@ -25,11 +25,39 @@ namespace TextBrowser.UI
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private readonly List<ReadabilityResponse> history = new List<ReadabilityResponse>();
+        private int historyIndex = -1;
+
         public MainPage()
         {
             this.InitializeComponent();
-
             wevMain.Navigate(new Uri("http://www.codeproject.com"));
+        }
+
+        private void UpdateButtons()
+        {
+            btnBack.IsEnabled = this.historyIndex > 0;
+            btnForward.IsEnabled = this.historyIndex < history.Count - 1;
+        }
+
+        private void ShowHistoryItem(int historyIndex)
+        {
+            ReadabilityResponse responseContent = history[historyIndex];
+            wevMain.NavigateToString(responseContent.content);
+            this.historyIndex = historyIndex;
+            UpdateButtons();
+        }
+
+        private void ShowResponse(ReadabilityResponse responseContent)
+        {
+            wevMain.NavigateToString(responseContent.content);
+
+            while (historyIndex + 1 < history.Count)
+                history.RemoveAt(historyIndex + 1);
+
+            history.Add(responseContent);
+            historyIndex++;
+            UpdateButtons();
         }
 
         private async void wevMain_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs e)
@@ -50,24 +78,29 @@ namespace TextBrowser.UI
                 {
                     ReadabilityResponse responseContent = JsonConvert.DeserializeObject<ReadabilityResponse>(await response.Content.ReadAsStringAsync());
                     if (responseContent != null)
-                        wevMain.NavigateToString(responseContent.content);
-
-                    btnBack.IsEnabled = wevMain.CanGoBack;
-                    btnForward.IsEnabled = wevMain.CanGoForward;
+                        ShowResponse(responseContent);
                 }
             }
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
         {
-            if (wevMain.CanGoBack)
-                wevMain.GoBack();
+            if (history.Count > 0)
+            {
+                int newIndex = historyIndex - 1;
+                if (newIndex >= 0)
+                    ShowHistoryItem(newIndex);
+            }
         }
 
         private void btnForward_Click(object sender, RoutedEventArgs e)
         {
-            if (wevMain.CanGoForward)
-                wevMain.GoForward();
+            if (history.Count > 0)
+            {
+                int newIndex = historyIndex + 1;
+                if (newIndex < history.Count)
+                    ShowHistoryItem(newIndex);
+            }
         }
     }
 
@@ -88,5 +121,11 @@ namespace TextBrowser.UI
         public object lead_image_url { get; set; }
         public string title { get; set; }
         public int rendered_pages { get; set; }
+    }
+
+    public enum NavigationDirection
+    {
+        Back,
+        Forward
     }
 }
