@@ -36,7 +36,8 @@ namespace TextBrowser.UI
         {
             InitializeComponent();
             UpdateButtons();
-            wevMain.Navigate(new Uri("http://www.codeproject.com"));
+            //wevMain.Navigate(new Uri("http://www.codeproject.com"));
+            grdNavigate.Visibility = Visibility.Visible;
         }
 
         private IDisposable WithProgressBar()
@@ -45,15 +46,21 @@ namespace TextBrowser.UI
             prrMain.IsActive = true;
             return new DelegateDisposable(() =>
             {
-
                 grdLoading.Visibility = Visibility.Collapsed;
                 prrMain.IsActive = false;
             });
         }
 
+        private IDisposable WithWebView()
+        {
+            wevMain.NavigationStarting -= wevMain_NavigationStarting;
+            return new DelegateDisposable(() => wevMain.NavigationStarting += wevMain_NavigationStarting);
+        }
+
         private void UpdateButtons()
         {
             btnReload.IsEnabled = history.Count > 0;
+            btnWeb.IsEnabled = history.Count > 0;
             btnBack.IsEnabled = historyIndex > 0;
             btnForward.IsEnabled = historyIndex < history.Count - 1;
         }
@@ -143,6 +150,13 @@ namespace TextBrowser.UI
                 grdNavigate.Visibility = Visibility.Collapsed;
                 await NavigateTo(uri.ToString());
             }
+        }
+
+        private void btnWeb_Click(object sender, RoutedEventArgs e)
+        {
+            using (WithProgressBar())
+            using (WithWebView())
+                wevMain.Navigate(new Uri(tbxUrl.Text, UriKind.Absolute));
         }
     }
 

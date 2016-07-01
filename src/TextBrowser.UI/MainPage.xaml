@@ -22,6 +22,11 @@
                     <FontIcon Glyph="&#xE72C;" />
                 </AppBarButton.Icon>
             </AppBarButton>
+            <AppBarButton x:Name="btnWeb" Click="btnWeb_Click" Label="View web">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE774;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
             <AppBarButton x:Name="btnBack" Click="btnBack_Click" Label="Back">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xE830;" />
