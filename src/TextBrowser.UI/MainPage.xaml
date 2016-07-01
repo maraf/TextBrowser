@@ -5,9 +5,18 @@
     xmlns:local="using:TextBrowser.UI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:data="using:TextBrowser.UI.Data"
     mc:Ignorable="d">
+    <Page.Resources>
+        <data:VisibilityToBoolConverter x:Name="visibilityToBool" />
+    </Page.Resources>
     <Page.BottomAppBar>
-        <CommandBar>
+        <CommandBar ClosedDisplayMode="Minimal">
+            <AppBarToggleButton x:Name="btnNavigate" Label="Go to..." IsChecked="{x:Bind grdNavigate.Visibility, Converter={StaticResource visibilityToBool}, Mode=TwoWay}">
+                <AppBarToggleButton.Icon>
+                    <FontIcon Glyph="&#xE8AD;" />
+                </AppBarToggleButton.Icon>
+            </AppBarToggleButton>
             <AppBarButton x:Name="btnReload" Click="btnReload_Click" Label="Reload">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xE72C;" />
@@ -27,6 +36,9 @@
     </Page.BottomAppBar>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <WebView x:Name="wevMain" NavigationStarting="wevMain_NavigationStarting" />
+        <Grid x:Name="grdNavigate" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Visibility="Collapsed" VerticalAlignment="Bottom" Padding="10">
+            <TextBox x:Name="tbxUrl" KeyUp="tbxUrl_KeyUp" />
+        </Grid>
         <Grid x:Name="grdLoading" Background="Black" Opacity=".2" Visibility="Collapsed">
             <ProgressRing x:Name="prrMain" />
         </Grid>

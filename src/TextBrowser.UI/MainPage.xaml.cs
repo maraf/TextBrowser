@@ -9,6 +9,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.System;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -61,6 +62,7 @@ namespace TextBrowser.UI
         {
             ReadabilityResponse responseContent = history[historyIndex];
             wevMain.NavigateToString(responseContent.content);
+            tbxUrl.Text = responseContent.url;
             this.historyIndex = historyIndex;
             UpdateButtons();
         }
@@ -68,6 +70,7 @@ namespace TextBrowser.UI
         private void ShowResponse(ReadabilityResponse responseContent)
         {
             wevMain.NavigateToString(responseContent.content);
+            tbxUrl.Text = responseContent.url;
 
             while (historyIndex + 1 < history.Count)
                 history.RemoveAt(historyIndex + 1);
@@ -130,6 +133,16 @@ namespace TextBrowser.UI
         {
             if (history.Count > 0)
                 await NavigateTo(history[historyIndex].url);
+        }
+
+        private async void tbxUrl_KeyUp(object sender, KeyRoutedEventArgs e)
+        {
+            Uri uri;
+            if (e.Key == VirtualKey.Enter && Uri.TryCreate(tbxUrl.Text, UriKind.Absolute, out uri))
+            {
+                grdNavigate.Visibility = Visibility.Collapsed;
+                await NavigateTo(uri.ToString());
+            }
         }
     }
 
