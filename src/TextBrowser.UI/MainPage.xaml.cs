@@ -158,6 +158,12 @@ namespace TextBrowser.UI
             using (WithWebView())
                 wevMain.Navigate(new Uri(tbxUrl.Text, UriKind.Absolute));
         }
+
+        private void tbxUrl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (history.Count > 0)
+                grdNavigate.Visibility = Visibility.Collapsed;
+        }
     }
 
     public class ReadabilityResponse
