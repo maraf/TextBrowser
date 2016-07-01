@@ -8,6 +8,11 @@
     mc:Ignorable="d">
     <Page.BottomAppBar>
         <CommandBar>
+            <AppBarButton x:Name="btnReload" Click="btnReload_Click" Label="Reload">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE72C;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
             <AppBarButton x:Name="btnBack" Click="btnBack_Click" Label="Back">
                 <AppBarButton.Icon>
                     <FontIcon Glyph="&#xE830;" />
@@ -22,5 +27,8 @@
     </Page.BottomAppBar>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <WebView x:Name="wevMain" NavigationStarting="wevMain_NavigationStarting" />
+        <Grid x:Name="grdLoading" Background="Black" Opacity=".2" Visibility="Collapsed">
+            <ProgressRing x:Name="prrMain" />
+        </Grid>
     </Grid>
 </Page>

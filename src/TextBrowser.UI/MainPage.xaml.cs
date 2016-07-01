@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
@@ -25,19 +26,35 @@ namespace TextBrowser.UI
     /// </summary>
     public sealed partial class MainPage : Page
     {
+        private const string token = "43188a9c55599e6fac4c022559a857532dce3967";
+
         private readonly List<ReadabilityResponse> history = new List<ReadabilityResponse>();
         private int historyIndex = -1;
 
         public MainPage()
         {
-            this.InitializeComponent();
+            InitializeComponent();
+            UpdateButtons();
             wevMain.Navigate(new Uri("http://www.codeproject.com"));
+        }
+
+        private IDisposable WithProgressBar()
+        {
+            grdLoading.Visibility = Visibility.Visible;
+            prrMain.IsActive = true;
+            return new DelegateDisposable(() =>
+            {
+
+                grdLoading.Visibility = Visibility.Collapsed;
+                prrMain.IsActive = false;
+            });
         }
 
         private void UpdateButtons()
         {
-            btnBack.IsEnabled = this.historyIndex > 0;
-            btnForward.IsEnabled = this.historyIndex < history.Count - 1;
+            btnReload.IsEnabled = history.Count > 0;
+            btnBack.IsEnabled = historyIndex > 0;
+            btnForward.IsEnabled = historyIndex < history.Count - 1;
         }
 
         private void ShowHistoryItem(int historyIndex)
@@ -60,18 +77,15 @@ namespace TextBrowser.UI
             UpdateButtons();
         }
 
-        private async void wevMain_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs e)
+        private async Task NavigateTo(string url)
         {
-            if (e.Uri == null)
-                return;
-
-            e.Cancel = true;
-
+            using (WithProgressBar())
             using (HttpClient client = new HttpClient())
             {
                 HttpResponseMessage response = await client.GetAsync(String.Format(
-                    "https://www.readability.com/api/content/v1/parser?url={0}&token=43188a9c55599e6fac4c022559a857532dce3967",
-                    e.Uri.ToString()
+                    "https://www.readability.com/api/content/v1/parser?url={0}&token={1}",
+                    url,
+                    token
                 ));
 
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -81,6 +95,15 @@ namespace TextBrowser.UI
                         ShowResponse(responseContent);
                 }
             }
+        }
+
+        private async void wevMain_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs e)
+        {
+            if (e.Uri == null)
+                return;
+
+            e.Cancel = true;
+            await NavigateTo(e.Uri.ToString());
         }
 
         private void btnBack_Click(object sender, RoutedEventArgs e)
@@ -101,6 +124,12 @@ namespace TextBrowser.UI
                 if (newIndex < history.Count)
                     ShowHistoryItem(newIndex);
             }
+        }
+
+        private async void btnReload_Click(object sender, RoutedEventArgs e)
+        {
+            if (history.Count > 0)
+                await NavigateTo(history[historyIndex].url);
         }
     }
 
