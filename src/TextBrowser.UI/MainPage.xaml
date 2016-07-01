@@ -1,0 +1,26 @@
+﻿<Page
+    x:Class="TextBrowser.UI.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TextBrowser.UI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Page.BottomAppBar>
+        <CommandBar>
+            <AppBarButton x:Name="btnBack" Click="btnBack_Click" Label="Back">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xE830;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+            <AppBarButton x:Name="btnForward" Click="btnForward_Click" Label="Forward">
+                <AppBarButton.Icon>
+                    <FontIcon Glyph="&#xEA47;" />
+                </AppBarButton.Icon>
+            </AppBarButton>
+        </CommandBar>
+    </Page.BottomAppBar>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <WebView x:Name="wevMain" NavigationStarting="wevMain_NavigationStarting" />
+    </Grid>
+</Page>
